@@ -6,7 +6,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Locked Prank Site</title>
+    <title>Annoying Locked Prank Site</title>
     <style>
         body {
             background: #000;
@@ -38,7 +38,8 @@
 
         h1 {
             font-size: 3em;
-            margin-top: 10vh;
+            margin-top: 10Mamun: 10vh;
+            text-shadow: 0 0 10px #0f0;
             text-shadow: 0 0 10px #0f0;
             z-index: 10;
             position: relative;
@@ -82,33 +83,52 @@
             background: #0c0;
         }
 
-        .lock-overlay {
+        .annoying-alert {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            color: #f00;
+            background: linear-gradient(45 Profesional: deg, #ff00ff, #00ffff, #ff0000, #ffff00); /* Jarring neon colors */
+            color: #000;
             z-index: 1000;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            pointer-events: none; /* Allows interaction with form */
+            pointer-events: none;
+            animation: flash 0.2s infinite; /* Rapid flashing */
+            text-shadow: 0 0 10px #fff;
         }
 
-        .lock-overlay h2 {
-            font-size: 2.5em;
-            text-shadow: 0 0 10px #f00;
-            animation: glitch 0.5s infinite;
+        @keyframes flash {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
         }
 
-        .lock-overlay p {
-            font-size: 1.2em;
+        .annoying-alert h2 {
+            font-size: 3em;
+            color: #ff0000;
+            text-shadow: 0 0 15px #00ff00;
+            animation: text-glitch 0.3s infinite;
         }
 
-        /* Prevent browser UI visibility */
+        .annoying-alert p {
+            font-size: 1.5em;
+            color: #00ff00;
+            text-shadow: 0 0 10px #ff0000;
+        }
+
+        @keyframes text-glitch {
+            0% { transform: skew(0deg); }
+            20% { transform: skew(10deg); }
+            40% { transform: skew(-10deg); }
+            60% { transform: skew(5deg); }
+            80% { transform: skew(-5deg); }
+            100% { transform: skew(0deg); }
+        }
+
         .no-back {
             position: fixed;
             top: 0;
@@ -131,8 +151,11 @@
                 font-size: 1em;
                 padding: 8px;
             }
-            .lock-overlay h2 {
+            .annoying-alert h2 {
                 font-size: 2em;
+            }
+            .annoying-alert p {
+                font-size: 1.2em;
             }
         }
 
@@ -147,30 +170,33 @@
                 width: 100%;
                 margin: 10px 0;
             }
-            .lock-overlay h2 {
+            .annoying-alert h2 {
                 font-size: 1.5em;
+            }
+            .annoying-alert p {
+                font-size: 1em;
             }
         }
     </style>
 </head>
 <body>
     <div class="no-back"></div>
-    <h1>DEVICE LOCKED!</h1>
-    <p class="hacker-text">Controlled by LockMaster</p>
-    <p>Enter the unlock code to escape: (Hint: unlock123)</p>
+    <h1>DEVICE COMPROMISED!</h1>
+    <p class="hacker-text">Locked by AnnoyBot</p>
+    <p>Enter the unlock code to stop the chaos: (Hint: stopit123)</p>
     <form id="password-form">
         <input type="password" id="password" placeholder="Enter unlock code">
         <button type="button" onclick="checkPassword()">Submit</button>
     </form>
-    <div class="lock-overlay" id="lock-overlay">
-        <h2>WARNING: SYSTEM LOCKED!</h2>
-        <p>You cannot close this site! Press Home + Power to escape.</p>
+    <div class="annoying-alert" id="annoying-alert">
+        <h2>ALERT: SYSTEM INFECTED!</h2>
+        <p>AnnoyBot controls your device! You CANNOT escape!</p>
     </div>
 
     <script>
         // Prevent closing via browser navigation
         window.onbeforeunload = function() {
-            return "LockMaster has control! You cannot leave!";
+            return "AnnoyBot won't let you leave!";
         };
 
         // Enter fullscreen mode on Android
@@ -178,7 +204,7 @@
             const elem = document.documentElement;
             if (elem.requestFullscreen) {
                 elem.requestFullscreen().catch(err => console.log(err));
-            } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari, Android */
+            } else if (elem.webkitRequestFullscreen) {
                 elem.webkitRequestFullscreen().catch(err => console.log(err));
             }
         }
@@ -187,49 +213,57 @@
         window.history.pushState(null, null, window.location.href);
         window.onpopstate = function() {
             window.history.pushState(null, null, window.location.href);
-            ensureLockOverlay(); // Reinforce overlay on back attempt
+            ensureAnnoyingAlert(); // Reinforce alert on back attempt
         };
 
         // Prevent swipe gestures and pinch zoom
         document.addEventListener('touchstart', function(e) {
             if (e.touches.length > 1) {
-                e.preventDefault(); // Block pinch zoom
+                e.preventDefault();
             }
         }, { passive: false });
 
         document.addEventListener('touchmove', function(e) {
-            e.preventDefault(); // Block swipe gestures
+            e.preventDefault();
         }, { passive: false });
 
-        // Ensure lock overlay remains visible
-        function ensureLockOverlay() {
-            const overlay = document.getElementById('lock-overlay');
-            if (overlay.style.display !== 'flex') {
-                overlay.style.display = 'flex';
+        // Ensure annoying alert remains visible
+        function ensureAnnoyingAlert() {
+            const alert = document.getElementById('annoying-alert');
+            if (alert.style.display !== 'flex') {
+                alert.style.display = 'flex';
             }
         }
 
         // Check password to unlock
         function checkPassword() {
             const pass = document.getElementById('password').value;
-            if (pass === 'unlock123') {
-                alert('Access Granted! Lock disabled.');
+            if (pass === 'stopit123') {
+                alert('Access Granted! AnnoyBot disabled.');
                 window.onbeforeunload = null;
                 window.onpopstate = null;
-                document.getElementById('lock-overlay').remove();
-                // Exit fullscreen
+                document.getElementById('annoying-alert').remove();
                 if (document.exitFullscreen) {
                     document.exitFullscreen().catch(err => console.log(err));
                 } else if (document.webkitExitFullscreen) {
                     document.webkitExitFullscreen().catch(err => console.log(err));
                 }
-                // Re-enable touch gestures
                 document.removeEventListener('touchstart', preventDefault);
                 document.removeEventListener('touchmove', preventDefault);
             } else {
-                alert('Wrong Code! LockMaster strengthens the lock!');
-                ensureLockOverlay();
+                alert('Wrong Code! AnnoyBot intensifies the chaos!');
+                ensureAnnoyAlert();
             }
+        }
+
+        // Create annoying alert with random movement
+        function ensureAnnoyingAlert() {
+            const alert = document.getElementById('annoying-alert');
+            alert.style.display = 'flex';
+            // Randomly shift position slightly
+            setInterval(() => {
+                alert.style.transform = `translate(${Math.random() * 10 - 5}px, ${Math.random() * 10 - 5}px)`;
+            }, 200);
         }
 
         // Show password form after delay
@@ -241,7 +275,7 @@
         window.onload = function() {
             if (/Android/i.test(navigator.userAgent)) {
                 enterFullscreen();
-                setInterval(ensureLockOverlay, 500); // Keep overlay persistent
+                setInterval(ensureAnnoyingAlert, 500);
             }
         };
     </script>
