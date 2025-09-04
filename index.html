@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Hacked Prank Site</title>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Locked Prank Site</title>
     <style>
         body {
             background: #000;
@@ -15,10 +16,15 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
-            position: relative;
-            animation: glitch 1s infinite;
-            -webkit-user-select: none; /* Prevent text selection */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            -webkit-user-select: none;
             user-select: none;
+            z-index: 1;
+            animation: glitch 1s infinite;
         }
 
         @keyframes glitch {
@@ -49,9 +55,9 @@
 
         #password-form {
             margin-top: 20px;
-            display: none;
             z-index: 10;
             position: relative;
+            display: none;
         }
 
         input[type="password"] {
@@ -76,62 +82,7 @@
             background: #0c0;
         }
 
-        .code-background {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: 1;
-            opacity: 0.3;
-            pointer-events: none;
-        }
-
-        .code-snippet {
-            position: absolute;
-            color: #0f0;
-            font-size: 0.8em;
-            white-space: pre;
-            animation: fall linear infinite;
-        }
-
-        @keyframes fall {
-            0% { transform: translateY(-100vh); }
-            100% { transform: translateY(100vh); }
-        }
-
-        .cmd-window {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 2;
-            color: #0f0;
-            text-align: left;
-            padding: 20px;
-            box-sizing: border-box;
-            font-size: 0.9em;
-            overflow: hidden;
-        }
-
-        .cmd-window pre {
-            margin: 0;
-            white-space: pre-wrap;
-            animation: typing 10s steps(30, end) infinite;
-            display: inline-block;
-        }
-
-        @keyframes typing {
-            0% { width: 0; }
-            50% { width: 100%; }
-            100% { width: 0; }
-        }
-
-        /* Persistent Popup Styles */
-        .persistent-popup {
+        .lock-overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -144,27 +95,27 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            pointer-events: auto;
+            pointer-events: none; /* Allows interaction with form */
         }
 
-        .persistent-popup h2 {
+        .lock-overlay h2 {
             font-size: 2.5em;
             text-shadow: 0 0 10px #f00;
             animation: glitch 0.5s infinite;
         }
 
-        .persistent-popup p {
+        .lock-overlay p {
             font-size: 1.2em;
         }
 
-        /* Prevent back button visual */
+        /* Prevent browser UI visibility */
         .no-back {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 9999;
+            z-index: 999;
             pointer-events: none;
         }
 
@@ -180,10 +131,7 @@
                 font-size: 1em;
                 padding: 8px;
             }
-            .code-snippet, .cmd-window pre {
-                font-size: 0.6em;
-            }
-            .persistent-popup h2 {
+            .lock-overlay h2 {
                 font-size: 2em;
             }
         }
@@ -199,10 +147,7 @@
                 width: 100%;
                 margin: 10px 0;
             }
-            .code-snippet, .cmd-window pre {
-                font-size: 0.5em;
-            }
-            .persistent-popup h2 {
+            .lock-overlay h2 {
                 font-size: 1.5em;
             }
         }
@@ -210,44 +155,25 @@
 </head>
 <body>
     <div class="no-back"></div>
-    <h1>Your Device Has Been HACKED!</h1>
-    <p class="hacker-text">Hacked by HengkiDev</p>
-    <p>Enter the admin password to regain control: (Hint: admin123)</p>
+    <h1>DEVICE LOCKED!</h1>
+    <p class="hacker-text">Controlled by LockMaster</p>
+    <p>Enter the unlock code to escape: (Hint: unlock123)</p>
     <form id="password-form">
-        <input type="password" id="password" placeholder="Enter password">
+        <input type="password" id="password" placeholder="Enter unlock code">
         <button type="button" onclick="checkPassword()">Submit</button>
     </form>
-    <div class="code-background" id="code-background"></div>
-    <div class="cmd-window">
-        <pre>
-C:\> dir
- dir   system32    hack.exe
-C:\> hack.exe
-Initiating system breach...
-Accessing kernel32.dll... [OK]
-Bypassing firewall... [OK]
-Injecting payload...
-[ERROR] Access Denied! Enter admin password to proceed.
-C:\> whoami
-HACKER\HengkiDev
-C:\> net user admin /add
-User admin added successfully.
-C:\> shutdown /r /t 0
-System shutdown initiated...
-        </pre>
-    </div>
-    <div class="persistent-popup" id="annoying-popup" style="display: none;">
-        <h2>WARNING: SYSTEM COMPROMISED!</h2>
-        <p>HengkiDev has locked this device. You cannot escape!</p>
+    <div class="lock-overlay" id="lock-overlay">
+        <h2>WARNING: SYSTEM LOCKED!</h2>
+        <p>You cannot close this site! Press Home + Power to escape.</p>
     </div>
 
     <script>
-        // Prevent closing without confirmation
+        // Prevent closing via browser navigation
         window.onbeforeunload = function() {
-            return "Are you sure you want to leave? Your device is under HengkiDev's control!";
+            return "LockMaster has control! You cannot leave!";
         };
 
-        // Android-specific: Request fullscreen to trap user
+        // Enter fullscreen mode on Android
         function enterFullscreen() {
             const elem = document.documentElement;
             if (elem.requestFullscreen) {
@@ -257,130 +183,65 @@ System shutdown initiated...
             }
         }
 
-        // Prevent back navigation on Android
+        // Prevent back navigation
         window.history.pushState(null, null, window.location.href);
         window.onpopstate = function() {
             window.history.pushState(null, null, window.location.href);
-            createPersistentPopup(); // Reinforce popup on back attempt
+            ensureLockOverlay(); // Reinforce overlay on back attempt
         };
 
-        // Show password form after delay
-        setTimeout(() => {
-            document.getElementById('password-form').style.display = 'block';
-        }, 2000);
+        // Prevent swipe gestures and pinch zoom
+        document.addEventListener('touchstart', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault(); // Block pinch zoom
+            }
+        }, { passive: false });
 
-        // Create persistent popup
-        function createPersistentPopup() {
-            const popup = document.getElementById('annoying-popup');
-            popup.style.display = 'flex';
-            // Prevent closing by clicking outside
-            popup.onclick = (e) => e.stopPropagation();
-            // Attempt to re-show if closed
-            setInterval(() => {
-                if (popup.style.display !== 'flex') {
-                    popup.style.display = 'flex';
-                }
-            }, 500);
+        document.addEventListener('touchmove', function(e) {
+            e.preventDefault(); // Block swipe gestures
+        }, { passive: false });
+
+        // Ensure lock overlay remains visible
+        function ensureLockOverlay() {
+            const overlay = document.getElementById('lock-overlay');
+            if (overlay.style.display !== 'flex') {
+                overlay.style.display = 'flex';
+            }
         }
 
-        // Function to check password
+        // Check password to unlock
         function checkPassword() {
             const pass = document.getElementById('password').value;
-            if (pass === 'admin123') {
-                alert('Access Granted! Prank over. :)');
-                // Allow normal close and exit
+            if (pass === 'unlock123') {
+                alert('Access Granted! Lock disabled.');
                 window.onbeforeunload = null;
                 window.onpopstate = null;
-                document.getElementById('annoying-popup').remove();
-                document.querySelectorAll('.code-snippet').forEach(code => code.remove());
-                document.querySelectorAll('.cmd-window').forEach(cmd => cmd.remove());
+                document.getElementById('lock-overlay').remove();
                 // Exit fullscreen
                 if (document.exitFullscreen) {
                     document.exitFullscreen().catch(err => console.log(err));
                 } else if (document.webkitExitFullscreen) {
                     document.webkitExitFullscreen().catch(err => console.log(err));
                 }
+                // Re-enable touch gestures
+                document.removeEventListener('touchstart', preventDefault);
+                document.removeEventListener('touchmove', preventDefault);
             } else {
-                alert('Wrong Password! HengkiDev is unleashing more malware popups...');
-                spamPopups();
-                createPersistentPopup(); // Show persistent popup on wrong password
+                alert('Wrong Code! LockMaster strengthens the lock!');
+                ensureLockOverlay();
             }
         }
 
-        // Spam popups function
-        function spamPopups() {
-            const popupMessages = [
-                '<h1>HACKED!</h1><p>HengkiDev owns your system!</p>',
-                '<h1>WARNING!</h1><p>Malware installed by HengkiDev!</p>',
-                '<h1>ERROR 404!</h1><p>Access Denied by HengkiDev!</p>',
-                '<h1>SYSTEM BREACH!</h1><p>Data stolen by HengkiDev...</p>',
-                '<h1>ALERT!</h1><p>Virus deployed by HengkiDev!</p>',
-                '<h1>CRITICAL!</h1><p>HengkiDev is watching you!</p>',
-                '<h1>LOCKED!</h1><p>System encrypted by HengkiDev!</p>'
-            ];
-            for (let i = 0; i < 15; i++) {
-                const popup = window.open('', '_blank', `width=${Math.random() * 400 + 200},height=${Math.random() * 300 + 200},top=${Math.random() * (window.screen.height - 300)},left=${Math.random() * (window.screen.width - 400)}`);
-                if (popup) {
-                    popup.document.write(`
-                        ${popupMessages[Math.floor(Math.random() * popupMessages.length)]}
-                        <style>
-                            body { background: #000; color: #0f0; font-family: "Courier New"; text-align: center; }
-                            h1 { text-shadow: 0 0 10px #0f0; }
-                            p { font-size: 1.2em; }
-                        </style>
-                        <script>
-                            window.onbeforeunload = function() { return "HengkiDev won't let you close this!"; };
-                            setInterval(() => {
-                                window.moveTo(Math.random() * (screen.width - 400), Math.random() * (screen.height - 300));
-                            }, 500);
-                            setInterval(() => {
-                                alert("HengkiDev's malware is unstoppable!");
-                            }, ${Math.random() * 3000 + 2000});
-                        </script>
-                    `);
-                    popup.onbeforeunload = function() {
-                        return "HengkiDev won't let you close this!";
-                    };
-                    popup.setInterval(() => {
-                        popup.moveTo(Math.random() * (window.screen.width - 400), Math.random() * (window.screen.height - 300));
-                    }, 500);
-                }
-            }
-            setTimeout(spamPopups, 2000);
-        }
+        // Show password form after delay
+        setTimeout(() => {
+            document.getElementById('password-form').style.display = 'block';
+        }, 2000);
 
-        // Code rain effect
-        const codeSnippets = [
-            'C:\\> dir hack.exe',
-            'C:\\> netstat -an',
-            'C:\\> ping hengkidev.com',
-            'C:\\> taskkill /IM system',
-            'C:\\> whoami',
-            'ERROR: Access Denied by HengkiDev!',
-            'C:\\> shutdown /r /t 0',
-            'C:\\> net user HengkiDev /add'
-        ];
-
-        function spawnCodeRain() {
-            const codeBackground = document.getElementById('code-background');
-            const snippet = document.createElement('div');
-            snippet.className = 'code-snippet';
-            snippet.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
-            snippet.style.left = Math.random() * window.innerWidth + 'px';
-            snippet.style.animationDuration = Math.random() * 5 + 5 + 's';
-            codeBackground.appendChild(snippet);
-            setTimeout(() => snippet.remove(), 10000);
-        }
-
-        // Start code rain
-        setInterval(spawnCodeRain, 200);
-
-        // Start initial spam and fullscreen
+        // Initialize on load
         window.onload = function() {
-            setTimeout(spamPopups, 500);
             if (/Android/i.test(navigator.userAgent)) {
                 enterFullscreen();
-                createPersistentPopup();
+                setInterval(ensureLockOverlay, 500); // Keep overlay persistent
             }
         };
     </script>
